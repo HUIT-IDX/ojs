@@ -1,0 +1,47 @@
+version: '3.8'  
+  
+services:  
+  web:  
+    build: .  
+    ports:  
+      - "8080:80"  
+    volumes:  
+      - .:/var/www/html  
+      - /var/www/html/vendor
+      - /var/www/html/lib/pkp/lib/vendor
+      - ./files:/var/www/html/files  
+      - ./public:/var/www/html/public  
+      - ./cache:/var/www/html/cache  
+    environment:  
+      - APACHE_DOCUMENT_ROOT=/var/www/html  
+    depends_on:  
+      - db  
+  
+  db:  
+    image: mysql:8.0  
+    container_name: ojs_db
+    command: --default-authentication-plugin=mysql_native_password
+    environment:  
+      MYSQL_ROOT_PASSWORD: root  
+      MYSQL_DATABASE: ojs  
+      # MYSQL_USER: root  
+      # MYSQL_PASSWORD: 1234  
+    ports:  
+      - "3306:3306"  
+    volumes:  
+      - mysql_data:/var/lib/mysql  
+  
+  phpmyadmin:  
+    image: phpmyadmin/phpmyadmin  
+    container_name: ojs_pma
+    ports:  
+      - "8081:80"  
+    environment:  
+      PMA_HOST: db  
+      PMA_USER: root  
+      PMA_PASSWORD: root  
+    depends_on:  
+      - db  
+  
+volumes:  
+  mysql_data:
